@@ -1,0 +1,35 @@
+#main-container{
+    display: flex;
+}
+
+app-sidebar{
+    width: 300px;
+}
+
+app-graph-list{
+    flex: 1;
+}
+
+@media (max-width: 930px) {
+    app-sidebar{
+        display: none
+    }    
+}
+
+footer{
+    position: relative;
+    padding: 10px 20px 10px 20px;
+    box-sizing: border-box;
+    background-color: #333;
+    color: white;
+    z-index: 2000;
+    text-align: center;
+
+    a{
+        color: #a19fb5;
+
+        &:hover{
+            filter: brightness(1.1)
+        }
+    }
+}

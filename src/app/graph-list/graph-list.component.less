@@ -1,0 +1,165 @@
+#set-graph-options{
+    display: flex;
+    position: sticky;
+    top: 0;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #a19fb5;
+    flex-flow:row wrap;
+    color: #eee;
+    z-index: 100;
+
+    .option{
+        margin-left: 20px;
+        user-select: none;
+        margin-top: 5px;
+        margin-bottom: 5px;
+
+        &, div{
+            display: inline-block;
+        }
+
+        .option-slide{
+            border-radius: 5px; 
+            margin-left: 8px;
+            padding: 8px;
+            background-color: #eee;
+            color: #a19fb5;
+            border: none !important;
+            width: 40px;
+            text-align: center;
+        }
+
+        .option-options{
+            border: 1px solid #eee;
+            border-radius: 6px; 
+            margin-left: 8px;
+
+            .option-options-option{
+                padding: 8px;
+                cursor: pointer;
+
+                &:last-child{
+                    border-radius: 0 5px 5px 0; 
+                }
+
+                &:first-child{
+                    border-radius: 5px 0 0 5px; 
+                }
+
+                &:hover{
+                    background-color: rgba(0,0,0,.2)
+                }
+
+                &.selected{
+                    background-color: #eee;
+                    color: #a19fb5;
+
+                    &:hover{
+                        background-color: #ddd;
+                    }
+                }
+            }
+        }
+    }
+}
+
+#set-graph-description{
+    padding: 25px;
+    margin-bottom: -15px;
+
+    ul{
+        margin: -4px;
+        margin-top: 5px;
+
+        li{
+            margin-top: 2px;
+        }
+    }
+}
+
+#help-toggle{
+    position: absolute;
+    margin: 10px;
+    margin-top: 12px;
+    cursor: pointer;
+    border: 2px solid #5f5e6e;
+    padding: 6px;
+    width: 80px;
+    border-radius: 5px;
+    text-align: center;
+
+    &:hover{
+        background-color: rgba(0,0,0,.1);
+    }
+
+    img{
+        filter: invert(1);
+        width: 20px;
+        height: 20px;
+        vertical-align: middle;
+        margin-left: 5px;
+        margin-right: 5px;
+        transform: scale(1.2)
+    }
+}
+
+#help-list{
+    position: relative;
+    top: 10px;
+    left: 120px;
+}
+
+#help-filler{
+    margin-top: 40px;
+}
+
+#set-graph-divider{
+    width: 98%;
+    margin: auto;
+    margin-top: 20px;
+    height: 1px;
+    border-top: 1px solid #dde ;
+}
+
+#set-graphs-container{
+    width: 100%;
+    padding-bottom: 40px;
+}
+
+.set-graphs-container-year{
+    width: 100%;
+}
+
+.set-graphs-container-year-title{
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: -15px;
+    font-size: 21px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #efefef;
+    margin-right: 19px;
+    color: #a19fb5;
+    user-select: none;
+
+    span{
+        cursor: pointer;
+
+        &:hover{
+            filter: brightness(.9)
+        }
+    }
+}
+
+.set-graphs-container-year-years{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.set-graph-holder{
+    width: 310px;
+    height: 240px;
+    margin-bottom: 10px;
+}

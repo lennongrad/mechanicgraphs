@@ -1,0 +1,25 @@
+<div id="set-holder">
+    <div id="display-holder">
+        <div id="title">
+            <div id="symbol"><img [src]="set?.symbol"></div>
+            <div id="name">{{set?.name}} <span id="year" *ngIf="_division != 'Year'">({{set?.year}})</span></div>
+        </div>
+    
+        <canvas id="chart_canvas" width="180" height="180" #chartCanvas></canvas>
+
+        <div id="color-icons">
+            <img *ngFor="let color of colors; index as i" [src]="colorIcons.get(color)"
+             [ngStyle]="getStyleColorIcon(i)" (click)="clickColor(i)" [class.selected]="i == lastClickedColor"
+             (mouseover)="hoverColor(i)" (mouseout)="unhoverColor(i)">
+        </div>
+    </div>
+    
+    <div id="mechanics">
+        <div id="mechanics-list">
+            <div class="mechanic" *ngFor="let mechanic of getMechanics()" (mouseover)="hover(mechanic.name)" (mouseout)="unhover(mechanic.name)" 
+            (click)="selectMechanic(mechanic.name, $event)" (contextmenu)="rightClick(mechanic)" title="{{getMechanicTooltip(mechanic.name)}}">
+                <div class="mechanic-color" [style]="getCircleStyle(mechanic)"></div><span class="mechanic-name">{{getMechanicTitle(mechanic.name)}}</span>
+            </div>
+        </div>
+    </div>
+</div>

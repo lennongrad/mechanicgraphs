@@ -1,0 +1,258 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { GoogleSheetsDbService } from 'ng-google-sheets-db';
+import { forkJoin } from 'rxjs';
+
+
+/*
+export interface Archetype{
+  name: string,
+  examples: Array<string>,
+  description: string,
+  analysis: string
+}
+  */
+
+
+export type mtgColor = "w" | "u" | "b" | "r" | "g" | "c"
+
+export interface SetCollection{
+  title: string,
+  enabled: boolean,
+  sets: Array<Set>
+}
+
+export interface Set{
+  setCode: string,
+  mechanics: Array<Mechanic>,
+  totalMechanics: Array<Mechanic>,
+  name?: string,
+  block?: string,
+  symbol?: string,
+  year?: number
+}
+
+export interface Mechanic{
+  name: string,
+  colors: {"w": number, "u": number, "b": number, "r": number, "g": number, "c": number},
+  displayColor: DisplayColor
+}
+
+interface MechanicData{
+  set: string,
+  name: string,
+  w: number,
+  u: number,
+  b: number,
+  r: number,
+  g: number,
+  c: number
+}
+
+const mechanicAttributesMapping = {
+  set: "Set",
+  name: "Mechanic",
+  w: "W",
+  u: "U",
+  b: "B",
+  r: "R",
+  g: "G",
+  c: "C"
+}
+
+interface SetData{
+  setCode: string,
+  name: string,
+  block: string,
+  setSymbol: string,
+  year: number
+}
+
+const setAttributesMapping = {
+  setCode: "Set Code",
+  name: "Name",
+  block: "Block",
+  setSymbol: "Set Symbol",
+  year: "Year"
+}
+
+export interface DisplayColor{
+  lightColor: string,
+  darkColor: string
+}
+
+
+
+// Keywords list
+export interface MechanicRules{
+  scryfall: string,
+  name: string
+}
+
+export interface MechanicRuleExtraction{
+  keyword: string,
+  scryfall: string,
+  title: string
+}
+
+const rulesAttributesMapping = {
+  keyword: "Keyword",
+  scryfall: "Scryfall",
+  title: "Title"
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CardDataService {
+  spreadsheetURL = "1KwEDqkyElcO7B4DBEyzWDFDLi0FSneRs2uw4P9xPIfg";
+
+  sets: Array<Set> = [];
+  displayColors: Array<DisplayColor> = [
+    {lightColor: "#e6194B", darkColor: "#800000"},
+    {lightColor: "#4363d8", darkColor: "#000075"},
+    {lightColor: "#f58231", darkColor: "#9A6324"},
+    {lightColor: "#bfef45", darkColor: "#8db035"},
+    {lightColor: "#3cb44b", darkColor: "#2a7834"},
+    {lightColor: "#42d4f4", darkColor: "#469990"},
+    {lightColor: "#ffe119", darkColor: "#808000"},
+    {lightColor: "#911eb4", darkColor: "#621c78"},
+
+    {lightColor: "#e6196e", darkColor: "#800000"},
+    {lightColor: "#4389d8", darkColor: "#000075"},
+    {lightColor: "#f56931", darkColor: "#9A6324"},
+    {lightColor: "#bfef45", darkColor: "#8db035"},
+    {lightColor: "#d3ef45", darkColor: "#2a7834"},
+    {lightColor: "#42d4f4", darkColor: "#469990"},
+    {lightColor: "#fffb19", darkColor: "#808000"},
+    {lightColor: "#821eb4", darkColor: "#621c78"},
+  ]
+
+  setsUndivided: Array<SetCollection> = [{title: "", sets: [], enabled: true}];
+  setsByYear: Array<SetCollection> = [];
+  setsByBlock: Array<SetCollection> = [];
+
+  mechanicRules = new Map<string, MechanicRules>();
+
+  getStd(mechanic: Mechanic): number{
+    var list: Array<number> = [mechanic.colors["w"], mechanic.colors["u"], mechanic.colors["b"], mechanic.colors["r"], mechanic.colors["g"]]
+
+    
+    const n = list.length
+    const mean = list.reduce((a, b) => a + b) / n
+    return Math.sqrt(list.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n)
+  }
+
+  getTotal(mechanic: Mechanic): number{
+    return mechanic.colors["w"] + mechanic.colors["u"]+ mechanic.colors["b"] + mechanic.colors["r"] + mechanic.colors["g"] + mechanic.colors["c"]
+  }
+
+  shuffleArray(array: Array<any>) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+  }
+
+  
+
+  attemptLoadMechanics(): void{
+    forkJoin([
+      this.googleSheetsDbService.get<MechanicData>(this.spreadsheetURL, "Set Keywords", mechanicAttributesMapping),
+      this.googleSheetsDbService.get<SetData>(this.spreadsheetURL, "Sets", setAttributesMapping),
+      this.googleSheetsDbService.get<MechanicRuleExtraction>(this.spreadsheetURL, "Keywords", rulesAttributesMapping),
+    ]).subscribe(([mechanicData, setData, mechanicRuleExtraction]) => { 
+      // Keep track of current set that is receiving rows
+      var currentSet : Set | undefined  = undefined;
+
+      // Track the color of each mechanic
+      var nextColor = 0;
+
+      mechanicData.forEach((mechanic: MechanicData) => {
+        // Establish new set
+        if (currentSet == undefined || currentSet.setCode != mechanic.set) {
+          currentSet = {
+            setCode: mechanic.set,
+            mechanics: [],
+            totalMechanics: []
+          }
+
+          this.sets.push(currentSet)
+          nextColor = (nextColor + 1) % (this.displayColors.length / 2)
+        }
+        
+        // Add mechanic to the last added set
+        currentSet.mechanics.push({
+          name: mechanic.name,
+          colors: {w: Number(mechanic.w), u: Number(mechanic.u), b: Number(mechanic.b), r: Number(mechanic.r), g: Number(mechanic.g), c: Number(mechanic.c)},
+          displayColor: this.displayColors[nextColor]
+        })
+
+        // Increment color so each mechanic has a different one
+        nextColor = (nextColor + 1) % this.displayColors.length
+      })
+
+      // Sort the mechanics of each color according to different criteria
+      this.sets.forEach(set => {
+        set.mechanics.sort((a, b) => this.getStd(b) - this.getStd(a));
+        set.totalMechanics = set.mechanics.slice().sort((a, b) => this.getTotal(a) - this.getTotal(b));
+      });
+
+      // Establish criteria of each set that was identified from the mechanics
+      setData.forEach((seDataItem: SetData) => {
+        var matchedSet = this.sets.find(el => el.setCode.toUpperCase() == seDataItem.setCode.toUpperCase())
+        
+        if(matchedSet != undefined){
+          matchedSet.block = seDataItem.block
+          matchedSet.name = seDataItem.name
+          matchedSet.symbol = seDataItem.setSymbol,
+          matchedSet.year = seDataItem.year
+        }
+      })
+
+      // Create a group containing all the sets
+      this.setsUndivided[0].sets = this.sets
+
+      // Initalize data to be used in the year and block grouping loop
+      var lastYear = 2024
+      var currentSetList: Array<Set> = []
+      this.setsByYear.push({title: String(lastYear), sets: currentSetList, enabled: true})
+
+      var lastBlock: string = this.sets[0]?.block!
+      var currentSetListBlock: Array<Set> = []
+      this.setsByBlock.push({title: lastBlock, sets: currentSetListBlock, enabled:true})
+
+      // Iterate over sets to group them into years and blocks
+      this.sets.forEach(set => {
+        // If different fro mlast set, make new group
+        if(set.year != lastYear){
+          lastYear = set.year!
+          currentSetList = []
+          this.setsByYear.push({title: String(lastYear), sets: currentSetList, enabled: true})
+        }
+
+        // If different from last block, make new group
+        if(set.block != lastBlock){
+          lastBlock = set.block!
+          currentSetListBlock = []
+          this.setsByBlock.push({title: lastBlock, sets: currentSetListBlock, enabled: true})
+        }
+
+        currentSetList.push(set)
+        currentSetListBlock.push(set)
+      })
+
+      // Simplified rule mapping
+      this.mechanicRules = new Map(mechanicRuleExtraction.map(rule => [
+        rule.keyword, 
+        { scryfall: rule.scryfall, name: rule.title }
+      ]));
+    })
+  }
+
+  constructor(private googleSheetsDbService: GoogleSheetsDbService) {
+    this.attemptLoadMechanics()
+   }
+}

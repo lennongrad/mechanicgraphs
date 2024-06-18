@@ -1,0 +1,54 @@
+<div id="set-graph-options">
+    <div class="option">
+        <div class="option-name">Sorted:</div>
+        <div class="option-options">
+            <div class="option-options-option" [class.selected]="sorted == 'Deviation'" (click)="clickSorted('Deviation')">Deviation</div>
+            <div class="option-options-option" [class.selected]="sorted == 'Total'" (click)="clickSorted('Total')">Total</div>
+        </div>
+    </div>
+    <div class="option">
+        <div class="option-name">Bars:</div>
+        <div class="option-options">
+            <div class="option-options-option" [class.selected]="bars == 'Hidden'" (click)="clickBars('Hidden')">Hidden</div>
+            <div class="option-options-option" [class.selected]="bars == 'Light'" (click)="clickBars('Light')">Light</div>
+            <div class="option-options-option" [class.selected]="bars == 'Dark'" (click)="clickBars('Dark')">Dark</div>
+        </div>
+    </div>
+    <div class="option">
+        <div class="option-name">Division:</div>
+        <div class="option-options">
+            <div class="option-options-option" [class.selected]="division == 'None'" (click)="clickDivision('None')">None</div>
+            <div class="option-options-option" [class.selected]="division == 'Year'" (click)="clickDivision('Year')">Year</div>
+            <div class="option-options-option" [class.selected]="division == 'Block'" (click)="clickDivision('Block')">Block</div>
+        </div>
+    </div>
+    <div class="option">
+        <div class="option-name">Buffer:</div>
+        <input type="text" class="option-slide" [(ngModel)]="buffer" (keyup)="bufferKeyUp()"/>
+    </div>
+</div>
+
+<div id="set-graph-description">
+    Each graph describes the color distribution of the main mechanics from the set based on color identity. It is inclusive, i.e. a Gruul card would be counted in both the red and green segments. Colorless means a card with no colors in its color identity. The charts are scaled to fill the entire vertical height, so the Y-axis has no specific unit.
+    <div id="help-toggle" (click)="hints = !hints"> <img src="assets/die.png" >Hints</div>
+    <ul id="help-list" *ngIf="hints">
+        <li>Click on the mechanic's name to disable it in the graph.</li>
+        <li>Ctrl + Click on an disabled mechanic to reset all the mechanics</li>
+        <li>Ctrl + Click on an enabled mechanic to disable all other mechanics.</li>
+        <li>Hover over a mechanic to see its Scryfall query.</li>
+        <li>Right click a mechanic to open its Scryfall query in another tab.</li>
+        <li>Swap the positions of two colors by clicking one after the other.</li>
+    </ul>
+    <div id="help-filler" *ngIf="!hints"></div>
+</div>
+
+<div id="set-graphs-container">
+    <div class="set-graphs-container-year" *ngFor="let year of getSetsByYear(); index as i">
+        <div class="set-graphs-container-year-title"><span (click)="year.enabled = !year.enabled">{{year.title}}</span></div>
+        <div class="set-graphs-container-year-years" *ngIf="year.enabled">
+            <div *ngFor="let setData of year.sets" class="set-graph-holder">
+                <app-set-graph [set]="setData" [sorted]="sorted" [bars]="bars" [buffer]="buffer_value" [division]="division"></app-set-graph>
+            </div>
+        </div>
+    </div>
+</div>
