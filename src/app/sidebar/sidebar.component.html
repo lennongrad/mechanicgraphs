@@ -1,7 +1,7 @@
 <div id="sidebar-container">
-    <h1><img src="assets/cog.png"/> <span>Set Mechanics</span></h1>
-    <h1><img src="assets/tree-branch.png"/> <span>Evergreen Mechanics</span></h1>
-    <h2><span>...by set</span></h2>
-    <h2><span>...by color</span></h2>
-    <h1 id="about"><img src="assets/fluffy-cloud.png"> <span>Miscellaneous</span></h1>
+    <h1 (click)="setActiveScreen('Set')"><img src="assets/cog.png"/> <span>Set Mechanics</span></h1>
+    <h1 (click)="setActiveScreen('EvergreenSet')"><img src="assets/tree-branch.png"/> <span>Evergreen Mechanics</span></h1>
+    <h2 (click)="setActiveScreen('EvergreenSet')"><span>...by set</span></h2>
+    <h2 (click)="setActiveScreen('EvergreenColor')"><span>...by color</span></h2>
+    <h1 id="about" (click)="setActiveScreen('Misc')"><img src="assets/fluffy-cloud.png"> <span>Miscellaneous</span></h1>
 </div>

@@ -64,14 +64,6 @@ export class SetGraphComponent implements OnInit {
 
   constructor(private cardDataService: CardDataService) { }
 
-  rightClick(mechanic: Mechanic){
-    var mechanicQuery = this.cardDataService.mechanicRules.get(mechanic.name)?.scryfall
-
-    if(mechanicQuery != undefined){
-      window.open("https://scryfall.com/search?q=s:" + this.set?.setCode + " " + mechanicQuery, '_blank');
-    }
-  }
-
   hoverColor(colorIndex: number){
     this.hoveredColor = colorIndex
     this.drawCanvas()
@@ -147,6 +139,14 @@ export class SetGraphComponent implements OnInit {
       }
     }
     this.drawCanvas()
+  }
+
+  rightClick(mechanic: Mechanic){
+    var mechanicQuery = this.cardDataService.mechanicRules.get(mechanic.name)?.scryfall
+
+    if(mechanicQuery != undefined){
+      window.open("https://scryfall.com/search?q=s:" + this.set?.setCode + " " + mechanicQuery, '_blank');
+    }
   }
 
   hover(mechanicName: string){

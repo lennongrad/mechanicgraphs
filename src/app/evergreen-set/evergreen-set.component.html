@@ -1,0 +1,36 @@
+<div id="set-graph-options">
+    <div class="option">
+        <div class="option-name">Sorted:</div>
+        <div class="option-options">
+            <div class="option-options-option">Deviation</div>
+            <div class="option-options-option" >Total</div>
+        </div>
+    </div>
+    <div class="option">
+        <div class="option-name">Bars:</div>
+        <div class="option-options">
+            <div class="option-options-option">Hidden</div>
+            <div class="option-options-option" >Light</div>
+            <div class="option-options-option">Dark</div>
+        </div>
+    </div>
+    <div class="option">
+        <div class="option-name">Division:</div>
+        <div class="option-options">
+            <div class="option-options-option" >None</div>
+            <div class="option-options-option">Year</div>
+            <div class="option-options-option">Block</div>
+        </div>
+    </div>
+</div>
+
+
+    
+<div id="mechanics">
+    <div id="mechanics-list">
+        <div class="mechanic" *ngFor="let mechanic of getMechanics()" (mouseover)="hover(mechanic.name)" (mouseout)="unhover(mechanic.name)" 
+        (click)="selectMechanic(mechanic.name, $event)" (contextmenu)="rightClick(mechanic)" title="{{getMechanicTooltip(mechanic.name)}}">
+            <div class="mechanic-color" [style]="getCircleStyle(mechanic)"></div><span class="mechanic-name">{{getMechanicTitle(mechanic.name)}}</span>
+        </div>
+    </div>
+</div>

@@ -8,13 +8,19 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { API_KEY } from 'ng-google-sheets-db';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
+import { EvergreenSetComponent } from './evergreen-set/evergreen-set.component';
+import { EvergreenColorComponent } from './evergreen-color/evergreen-color.component';
+import { MiscellaneousComponent } from './miscellaneous/miscellaneous.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SetGraphComponent,
     GraphListComponent,
-    SidebarComponent
+    SidebarComponent,
+    EvergreenSetComponent,
+    EvergreenColorComponent,
+    MiscellaneousComponent
   ],
   imports: [
     BrowserModule,

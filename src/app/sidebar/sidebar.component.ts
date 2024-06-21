@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActiveScreenService, ScreenVisible } from '../active-screen.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -7,7 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SidebarComponent implements OnInit {
 
-  constructor() { }
+  constructor(private activeScreenService: ActiveScreenService) { }
+
+  getActiveScreen(){
+    return this.activeScreenService.activeScreen
+  }
+
+  setActiveScreen(newActive: ScreenVisible){
+    this.activeScreenService.setActiveScreen(newActive)
+  }
 
   ngOnInit(): void {
   }

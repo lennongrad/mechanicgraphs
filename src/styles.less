@@ -4,6 +4,114 @@ body{
     font-family: "Roboto", sans-serif;
 }
 
+#set-graph-options{
+    display: flex;
+    position: sticky;
+    top: 0;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #a19fb5;
+    flex-flow:row wrap;
+    color: #eee;
+    z-index: 100;
+
+    .option{
+        margin-left: 20px;
+        user-select: none;
+        margin-top: 5px;
+        margin-bottom: 5px;
+
+        &, div{
+            display: inline-block;
+        }
+
+        .option-slide{
+            border-radius: 5px; 
+            margin-left: 8px;
+            padding: 8px;
+            background-color: #eee;
+            color: #a19fb5;
+            border: none !important;
+            width: 40px;
+            text-align: center;
+        }
+
+        .option-options{
+            border: 1px solid #eee;
+            border-radius: 6px; 
+            margin-left: 8px;
+
+            .option-options-option{
+                padding: 8px;
+                cursor: pointer;
+
+                &:last-child{
+                    border-radius: 0 5px 5px 0; 
+                }
+
+                &:first-child{
+                    border-radius: 5px 0 0 5px; 
+                }
+
+                &:hover{
+                    background-color: rgba(0,0,0,.2)
+                }
+
+                &.selected{
+                    background-color: #eee;
+                    color: #a19fb5;
+
+                    &:hover{
+                        background-color: #ddd;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+#mechanics{
+    margin-left: -20px;
+    padding-top: 55px;
+    width: 100%;
+
+    #mechanics-list{
+        height: 200px;
+        overflow-y: auto;
+    }
+
+    .mechanic{
+        cursor: pointer;
+        padding-left: 10px;
+        border-radius: 0 5px 5px 0;
+
+        .mechanic-color{
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 100%;
+            border-style: solid;
+            border-width: 0;
+            margin-right: 5px; 
+            box-sizing: border-box;
+        }
+    
+        .mechanic-name{
+            font-size: 12px;
+        }
+    }
+
+    .mechanic:hover{
+        background-color: #eee;
+        .mechanic-color{
+            border: 1px solid black;
+        }
+    }
+}
+
 
 ::-webkit-scrollbar {
     //background-color: rgba(0,0,0,.3);

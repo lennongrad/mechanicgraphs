@@ -1,3 +1,13 @@
+#cover{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color: #111;
+    z-index: 1000000;
+}
+
 #main-container{
     display: flex;
 }
@@ -6,8 +16,9 @@ app-sidebar{
     width: 300px;
 }
 
-app-graph-list{
+app-graph-list, app-evergreen-set, app-evergreen-color, app-miscellaneous{
     flex: 1;
+    min-height: 100vh
 }
 
 @media (max-width: 930px) {
@@ -15,6 +26,7 @@ app-graph-list{
         display: none
     }    
 }
+
 
 footer{
     position: relative;
