@@ -25,39 +25,47 @@ export interface SetCollection{
 export interface Set{
   setCode: string,
   mechanics: Array<Mechanic>,
+  allMechanics: Array<Mechanic>,
   totalMechanics: Array<Mechanic>,
   name?: string,
   block?: string,
   symbol?: string,
-  year?: number
+  year?: number,
+  total: number
 }
 
 export interface Mechanic{
   name: string,
+  type: string,
   colors: {"w": number, "u": number, "b": number, "r": number, "g": number, "c": number},
+  total: number,
   displayColor: DisplayColor
 }
 
 interface MechanicData{
   set: string,
   name: string,
+  type: string,
   w: number,
   u: number,
   b: number,
   r: number,
   g: number,
-  c: number
+  c: number,
+  t: number
 }
 
 const mechanicAttributesMapping = {
   set: "Set",
   name: "Mechanic",
+  type: "Type",
   w: "W",
   u: "U",
   b: "B",
   r: "R",
   g: "G",
-  c: "C"
+  c: "C",
+  t: "T"
 }
 
 interface SetData{
@@ -81,24 +89,32 @@ export interface DisplayColor{
   darkColor: string
 }
 
-
+export interface DEMechanic{
+  mechanicRule: MechanicRules,
+  bySet: Array<number>,
+  byColor: {"w": number, "u": number, "b": number, "r": number, "g": number, "c": number},
+  displayColor: DisplayColor
+}
 
 // Keywords list
 export interface MechanicRules{
   scryfall: string,
-  name: string
+  name: string,
+  type: string
 }
 
 export interface MechanicRuleExtraction{
   keyword: string,
+  title: string,
+  type: string,
   scryfall: string,
-  title: string
 }
 
 const rulesAttributesMapping = {
   keyword: "Keyword",
+  title: "Title",
+  type: "Type",
   scryfall: "Scryfall",
-  title: "Title"
 }
 
 @Injectable({
@@ -131,6 +147,8 @@ export class CardDataService {
   setsUndivided: Array<SetCollection> = [{title: "", sets: [], enabled: true}];
   setsByYear: Array<SetCollection> = [];
   setsByBlock: Array<SetCollection> = [];
+
+  deMechanics: Array<DEMechanic> = [];
 
   mechanicRules = new Map<string, MechanicRules>();
 
@@ -176,22 +194,34 @@ export class CardDataService {
           currentSet = {
             setCode: mechanic.set,
             mechanics: [],
-            totalMechanics: []
+            allMechanics: [],
+            totalMechanics: [],
+            total: 0
           }
 
           this.sets.push(currentSet)
           nextColor = (nextColor + 1) % (this.displayColors.length / 2)
         }
+
+        var mechanicValue: Mechanic = {
+          name: mechanic.name,
+          type: mechanic.type,
+          colors: {w: Number(mechanic.w), u: Number(mechanic.u), b: Number(mechanic.b), r: Number(mechanic.r), g: Number(mechanic.g), c: Number(mechanic.c)},
+          total: mechanic.t,
+          displayColor: this.displayColors[nextColor]
+        }
         
         // Add mechanic to the last added set
-        currentSet.mechanics.push({
-          name: mechanic.name,
-          colors: {w: Number(mechanic.w), u: Number(mechanic.u), b: Number(mechanic.b), r: Number(mechanic.r), g: Number(mechanic.g), c: Number(mechanic.c)},
-          displayColor: this.displayColors[nextColor]
-        })
+        currentSet.allMechanics.push(mechanicValue)
 
-        // Increment color so each mechanic has a different one
-        nextColor = (nextColor + 1) % this.displayColors.length
+        if(mechanic.type == "s"){
+          currentSet.mechanics.push(mechanicValue)
+          currentSet.total += Number(mechanic.t)
+          
+          // Increment color so each mechanic has a different one
+          nextColor = (nextColor + 1) % this.displayColors.length
+        }
+
       })
 
       // Sort the mechanics of each color according to different criteria
@@ -244,11 +274,42 @@ export class CardDataService {
         currentSetListBlock.push(set)
       })
 
-      // Simplified rule mapping
       this.mechanicRules = new Map(mechanicRuleExtraction.map(rule => [
         rule.keyword, 
-        { scryfall: rule.scryfall, name: rule.title }
+        { scryfall: rule.scryfall, name: rule.title, type: rule.type }
       ]));
+
+      var colorIndex = 0
+      this.mechanicRules.forEach((rule: MechanicRules, key: string) => {
+        if(rule.type == "d" || rule.type == "e"){
+          var newMechanic: DEMechanic = {
+            mechanicRule: rule,
+            bySet: [],
+            byColor: {"w": 0, "u": 0, "b": 0, "r": 0, "g": 0, "c": 0},
+            displayColor: this.displayColors[colorIndex]
+          }
+          colorIndex = (colorIndex + 1) % this.displayColors.length
+          this.deMechanics.push(newMechanic)
+
+          this.sets.forEach(set => {
+            var total = 0
+            set.allMechanics.forEach(mechanic => {
+              if(mechanic.name == key){
+                newMechanic.byColor["w"] += mechanic.colors["w"]
+                newMechanic.byColor["u"] += mechanic.colors["u"]
+                newMechanic.byColor["b"] += mechanic.colors["b"]
+                newMechanic.byColor["r"] += mechanic.colors["r"]
+                newMechanic.byColor["g"] += mechanic.colors["g"]
+                newMechanic.byColor["c"] += mechanic.colors["c"]
+                total += mechanic.total
+              }
+            })
+            newMechanic.bySet.push(total)
+          })
+        }
+      })
+
+      console.log(this.deMechanics)
     })
   }
 

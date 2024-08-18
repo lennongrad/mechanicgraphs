@@ -32,7 +32,10 @@ export class GraphListComponent implements OnInit {
 
   clickSorted(v: sortedType){
     this.sorted = v
-    
+  }
+
+  getSets(y: SetCollection): Array<Set>{
+    return y.sets.filter((set) => set.total > 0);
   }
 
   clickBars(v: barsType){

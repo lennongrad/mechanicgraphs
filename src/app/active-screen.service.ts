@@ -6,7 +6,7 @@ export type ScreenVisible = "Set" | "EvergreenSet" | "EvergreenColor" | "Misc"
   providedIn: 'root'
 })
 export class ActiveScreenService {
-  activeScreen: ScreenVisible = "EvergreenSet"
+  activeScreen: ScreenVisible = "Misc"
 
   setActiveScreen(newActive: ScreenVisible){
     this.activeScreen = newActive

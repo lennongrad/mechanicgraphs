@@ -46,7 +46,7 @@
     <div class="set-graphs-container-year" *ngFor="let year of getSetsByYear(); index as i">
         <div class="set-graphs-container-year-title"><span (click)="year.enabled = !year.enabled">{{year.title}}</span></div>
         <div class="set-graphs-container-year-years" *ngIf="year.enabled">
-            <div *ngFor="let setData of year.sets" class="set-graph-holder">
+            <div *ngFor="let setData of getSets(year)" class="set-graph-holder">
                 <app-set-graph [set]="setData" [sorted]="sorted" [bars]="bars" [buffer]="buffer_value" [division]="division"></app-set-graph>
             </div>
         </div>

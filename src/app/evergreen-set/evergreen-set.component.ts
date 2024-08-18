@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CardDataService, Mechanic } from '../card-data.service';
+import { CardDataService, DEMechanic, Mechanic } from '../card-data.service';
 
 
 @Component({
@@ -23,16 +23,12 @@ export class EvergreenSetComponent implements OnInit {
     }
   }
 
-  getMechanics(): Array<Mechanic>{
-    return [];
-    /*if(this.set?.mechanics == undefined){
-      return []
-    }
-    return (this._sorted == "Deviation" ? this.set.mechanics : this.set.totalMechanics)*/
+  getMechanics(): Array<DEMechanic>{
+    return this.cardDataService.deMechanics;
   }
 
-  getCircleStyle(mechanic: Mechanic): any{
-    if(this.selectedMechanics.includes(mechanic.name)){
+  getCircleStyle(mechanic: DEMechanic): any{
+    if(this.selectedMechanics.includes(mechanic.mechanicRule.name)){
       return {"borderColor": mechanic.displayColor.darkColor, "borderWidth": "2px"}
     }
 
@@ -62,9 +58,9 @@ export class EvergreenSetComponent implements OnInit {
   selectMechanic(mechanicName: string, event: MouseEvent){
     if(event.ctrlKey){
       if(this.selectedMechanics.indexOf(mechanicName) == -1){
-        this.getMechanics().forEach((mechanic: Mechanic) => {
-          if(mechanic.name != mechanicName){
-            this.selectedMechanics.push(mechanic.name)
+        this.getMechanics().forEach((mechanic: DEMechanic) => {
+          if(mechanic.mechanicRule.name != mechanicName){
+            this.selectedMechanics.push(mechanic.mechanicRule.name)
           }
         })
       } else {
@@ -80,8 +76,8 @@ export class EvergreenSetComponent implements OnInit {
     this.drawCanvas()
   }
 
-  rightClick(mechanic: Mechanic){
-    var mechanicQuery = this.cardDataService.mechanicRules.get(mechanic.name)?.scryfall
+  rightClick(mechanic: DEMechanic){
+    var mechanicQuery = mechanic.mechanicRule.scryfall
 
     if(mechanicQuery != undefined){
       window.open("https://scryfall.com/search?q=" + mechanicQuery, '_blank');

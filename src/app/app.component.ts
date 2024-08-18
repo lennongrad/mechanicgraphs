@@ -17,9 +17,7 @@ export class AppComponent implements OnInit{
 
   constructor(private activeScreenService: ActiveScreenService){}
 
-  ngOnInit(): void {
-      setTimeout(() => {
-        this.coverActive = false
-      }, 1000)
+  ngOnInit(): void {  
+                      
   }
 }
