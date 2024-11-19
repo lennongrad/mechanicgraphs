@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GoogleSheetsDbService } from 'ng-google-sheets-db';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 
 
 /*
@@ -80,9 +80,17 @@ const setAttributesMapping = {
   setCode: "Set Code",
   name: "Name",
   block: "Block",
-  setSymbol: "Set Symbol",
   year: "Year"
 }
+
+export interface Chapter {
+  title: string;
+  author: string;
+  year: number;
+  chapterNumber: number;
+  chapterText: string;
+}
+        
 
 export interface DisplayColor{
   lightColor: string,
@@ -122,6 +130,8 @@ const rulesAttributesMapping = {
 })
 export class CardDataService {
   spreadsheetURL = "1KwEDqkyElcO7B4DBEyzWDFDLi0FSneRs2uw4P9xPIfg";
+  private apiUrl = 'http://localhost:3000/api/chapters';
+
 
   sets: Array<Set> = [];
   displayColors: Array<DisplayColor> = [
@@ -173,7 +183,6 @@ export class CardDataService {
         array[j] = temp;
     }
   }
-
   
 
   attemptLoadMechanics(): void{
@@ -237,7 +246,7 @@ export class CardDataService {
         if(matchedSet != undefined){
           matchedSet.block = seDataItem.block
           matchedSet.name = seDataItem.name
-          matchedSet.symbol = seDataItem.setSymbol,
+          matchedSet.symbol = "https://svgs.scryfall.io/sets/" + seDataItem.setCode + ".svg",
           matchedSet.year = seDataItem.year
         }
       })
@@ -308,12 +317,19 @@ export class CardDataService {
           })
         }
       })
-
-      console.log(this.deMechanics)
     })
   }
 
   constructor(private googleSheetsDbService: GoogleSheetsDbService) {
-    this.attemptLoadMechanics()
-   }
+    this.attemptLoadMechanics();
+    var tCh: Chapter = {
+      title: "Test title",
+      author: "Test author",
+      year: 10,
+      chapterNumber: 15,
+      chapterText:"Lorem ipsum"
+    }
+    console.log("H")
+    console.log(tCh)
+  }
 }

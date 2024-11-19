@@ -167,92 +167,108 @@ export class SetGraphComponent implements OnInit {
     }
     return (this._sorted == "Deviation" ? this.set.mechanics : this.set.totalMechanics)
   }
-
-  drawCanvas(){
-    if(this.canvasContext == null || this.set == undefined){
+  
+  /**
+   * Draws a canvas graph showing the difference in prevalence of mechanics in certain groups.
+   * The graph is drawn using the canvas context, width, height, and colors defined in the class.
+   * It takes into account the selected mechanics and adjusts the graph accordingly.
+   *
+   * Edge cases:
+   * - If the canvas context or set is not defined, the function returns early without drawing anything.
+   * - If there are no active mechanics, the function will not draw any shapes.
+   * - If the greatest value in accumulatedColors is 0, the yPosition calculation will result in NaN, causing the vertices to be incorrect.
+   *   This can be mitigated by adding a check before calculating yPosition and handling the case when greatestValue is 0.
+   */
+  drawCanvas() {
+    // Early return if canvasContext or set is not defined
+    if (!this.canvasContext || !this.set) {
       return;
     }
 
-    var activeMechanics = this.getMechanics().filter((mechanic: Mechanic) => !this.selectedMechanics.includes(mechanic.name))
+    // Filter mechanics that are not in the selectedMechanics array
+    const activeMechanics = this.getMechanics().filter((mechanic: Mechanic) => !this.selectedMechanics.includes(mechanic.name));
 
-    this.canvasContext.clearRect(0,0,this.width,this.height)
+    // Clear the canvas before drawing new shapes
+    this.canvasContext.clearRect(0, 0, this.width, this.height);
 
-    var accumulatedColors = {"w": 0, "u": 0, "b": 0, "r": 0, "g": 0, "c": 0}
+    // Initialize accumulatedColors object to keep track of the sum of colors for each mechanic
+    const accumulatedColors = { w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
+    // Iterate over activeMechanics and update accumulatedColors
     activeMechanics.forEach(mechanic => {
       this.colors.forEach(color => {
-        accumulatedColors[color] += mechanic.colors[color] + this.yBuffer
-      })
-    })
+        accumulatedColors[color] += mechanic.colors[color] + this.yBuffer;
+      });
+    });
 
-    var greatestValue = Math.max(accumulatedColors["w"], accumulatedColors["u"], accumulatedColors["b"], accumulatedColors["r"], accumulatedColors["g"], accumulatedColors["c"])
+    // Calculate the greatest value in accumulatedColors
+    const greatestValue = Math.max(...Object.values(accumulatedColors));
 
-    var lastStroked = false
+    // Initialize lastStroked to false
+    let lastStroked = false;
 
+    // Iterate over activeMechanics and draw shapes
     activeMechanics.forEach(mechanic => {
-      // find vertices to tracec
-      var vertices: Array<{x: number,y:number}> = []
-      var accumulatedXPosition = this._buffer
-      vertices.push({x: 0, y: this.height})
-      this.colors.forEach(color => {
-        var yPosition = (accumulatedColors[color] / greatestValue) * (this.height - 10)
+      // Calculate vertices for the current mechanic
+      const vertices = this.colors.map((color, index) => ({
+        x: this._buffer + ((this.width - this._buffer * 2) / 5) * index,
+        y: this.height - ((accumulatedColors[color] / greatestValue) * (this.height - 10)),
+      }));
 
-        vertices.push({x: accumulatedXPosition, y: this.height - yPosition});
+      // Add start and end points to vertices
+      vertices.unshift({ x: 0, y: this.height });
+      vertices.push({ x: this.width, y: this.height });
 
-        accumulatedXPosition += (this.width - this._buffer * 2) / 5
-        accumulatedColors[color] -= mechanic.colors[color] + this.yBuffer
-      })
-      vertices.push({x: this.width, y: this.height})
-      vertices.push({x: 0, y: this.height})
+      // Set fillStyle based on mechanic name and lastHovered value
+      this.canvasContext!.fillStyle = mechanic.name === this.lastHovered ? mechanic.displayColor.darkColor : mechanic.displayColor.lightColor;
 
-
-      this.canvasContext!.fillStyle = mechanic.name == this.lastHovered ? mechanic.displayColor.darkColor : mechanic.displayColor.lightColor;
-
-      // fill in 
+      // Draw the filled shape using the vertices
       this.canvasContext!.beginPath();
-      this.canvasContext!.moveTo(vertices[0].x, vertices[0].y)
-      vertices.slice(1).forEach(vertex => {
-        this.canvasContext!.lineTo(vertex.x, vertex.y)
-      })
+      vertices.forEach(({ x, y }) => this.canvasContext!.lineTo(x, y));
       this.canvasContext!.closePath();
       this.canvasContext!.fill();
 
-      // if need to stroke
-      if(mechanic.name == this.lastHovered || lastStroked){
+      // Draw the stroked shape if mechanic name matches lastHovered or lastStroked is true
+      if (mechanic.name === this.lastHovered || lastStroked) {
         this.canvasContext!.beginPath();
-        this.canvasContext!.moveTo(vertices[0].x, vertices[0].y)
-        vertices.slice(1).forEach(vertex => {
-          this.canvasContext!.lineTo(vertex.x, vertex.y)
-        })
+        vertices.forEach(({ x, y }) => this.canvasContext!.lineTo(x, y));
         this.canvasContext!.closePath();
         this.canvasContext!.stroke();
       }
 
-      lastStroked = mechanic.name == this.lastHovered 
-    })
+      // Update lastStroked based on mechanic name and lastHovered value
+      lastStroked = mechanic.name === this.lastHovered;
 
-    var hoveredBarColor = this._bars == "Light" ? "#111" : (this._bars == "Dark" ? "#000" : "#333") 
-    var unhoveredBarColor = this._bars == "Light" ? "#444" : (this._bars == "Dark" ? "#111" : "#fff")
-    var hoveredBarThickness = this._bars == "Light" ? .75 : (this._bars == "Dark" ? .95 : .5)
-    var unhoveredBarThickness = this._bars == "Light" ? .5 : (this._bars == "Dark" ? .75 : .1)
+      // Update accumulatedColors for the next iteration
+      this.colors.forEach(color => {
+        accumulatedColors[color] -= mechanic.colors[color] + this.yBuffer;
+      });
+    });
 
-    // draw lines
-    var accumulatedXPosition = this._buffer
-    for(var i = 0; i < 6; i++){
-      this.canvasContext!.strokeStyle = this.hoveredColor == i ? hoveredBarColor : unhoveredBarColor;
-      this.canvasContext!.lineWidth = this.hoveredColor == i ? hoveredBarThickness : unhoveredBarThickness;
+    // Set colors and lineWidth based on hoveredColor and _bars value
+    const hoveredBarColor = this._bars === "Light" ? "#111" : this._bars === "Dark" ? "#000" : "#333";
+    const unhoveredBarColor = this._bars === "Light" ? "#444" : this._bars === "Dark" ? "#111" : "#fff";
+    const hoveredBarThickness = this._bars === "Light" ? 0.75 : this._bars === "Dark" ? 0.95 : 0.5;
+    const unhoveredBarThickness = this._bars === "Light" ? 0.5 : this._bars === "Dark" ? 0.75 : 0.1;
 
-      if(this.canvasContext!.lineWidth > .2){
-        this.canvasContext!.beginPath();
-        this.canvasContext!.moveTo(accumulatedXPosition, this.height)
-        this.canvasContext!.lineTo(accumulatedXPosition, 0)
-        this.canvasContext!.closePath();
-        this.canvasContext!.stroke();
+    // Draw vertical lines for each color
+    for (let i = 0; i < 6; i++) {
+      this.canvasContext.strokeStyle = this.hoveredColor === i ? hoveredBarColor : unhoveredBarColor;
+      this.canvasContext.lineWidth = this.hoveredColor === i ? hoveredBarThickness : unhoveredBarThickness;
+
+      // Only draw the line if the lineWidth is greater than 0.2
+      if (this.canvasContext.lineWidth > 0.2) {
+        this.canvasContext.beginPath();
+        this.canvasContext.moveTo(this._buffer + ((this.width - this._buffer * 2) / 5) * i, this.height);
+        this.canvasContext.lineTo(this._buffer + ((this.width - this._buffer * 2) / 5) * i, 0);
+        this.canvasContext.closePath();
+        this.canvasContext.stroke();
       }
-      accumulatedXPosition += (this.width - this._buffer * 2) / 5
     }
-    this.canvasContext!.lineWidth = 1;
-    this.canvasContext!.strokeStyle = 'black';
+
+    // Reset lineWidth and strokeStyle for future drawings
+    this.canvasContext.lineWidth = 1;
+    this.canvasContext.strokeStyle = 'black';
   }
 
   ngOnInit(): void {

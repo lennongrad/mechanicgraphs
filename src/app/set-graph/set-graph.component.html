@@ -2,7 +2,7 @@
     <div id="display-holder">
         <div id="title">
             <div id="symbol"><img [src]="set?.symbol"></div>
-            <div id="name">{{set?.name}}<span id="year" *ngIf="_division != 'Year'">({{set?.year}})</span></div>
+            <div id="name">{{set?.name}}<span id="year" *ngIf="_division != 'Year'"> ({{set?.year}})</span></div>
         </div>
     
         <canvas id="chart_canvas" width="180" height="180" #chartCanvas></canvas>

@@ -9,7 +9,7 @@ import { CardDataService, DEMechanic, Mechanic } from '../card-data.service';
 })
 export class EvergreenSetComponent implements OnInit {
   lastHovered?: string;
-  selectedMechanics: Array<string> = []
+  selectedMechanic?: string;
 
   hover(mechanicName: string){
     this.lastHovered = mechanicName
@@ -28,7 +28,7 @@ export class EvergreenSetComponent implements OnInit {
   }
 
   getCircleStyle(mechanic: DEMechanic): any{
-    if(this.selectedMechanics.includes(mechanic.mechanicRule.name)){
+    if(this.selectedMechanic != mechanic.mechanicRule.name){
       return {"borderColor": mechanic.displayColor.darkColor, "borderWidth": "2px"}
     }
 
@@ -56,24 +56,29 @@ export class EvergreenSetComponent implements OnInit {
   }
 
   selectMechanic(mechanicName: string, event: MouseEvent){
-    if(event.ctrlKey){
-      if(this.selectedMechanics.indexOf(mechanicName) == -1){
-        this.getMechanics().forEach((mechanic: DEMechanic) => {
-          if(mechanic.mechanicRule.name != mechanicName){
-            this.selectedMechanics.push(mechanic.mechanicRule.name)
-          }
-        })
-      } else {
-        this.selectedMechanics = []
-      }
+    if(this.selectedMechanic == mechanicName){
+      this.selectedMechanic = undefined
     } else {
-      if(this.selectedMechanics.indexOf(mechanicName) != -1){
-        this.selectedMechanics = this.selectedMechanics.filter((name: string) => name != mechanicName)
-      } else {
-        this.selectedMechanics.push(mechanicName)
-      }
+      this.selectedMechanic = mechanicName
     }
-    this.drawCanvas()
+    // if(event.ctrlKey){
+    //   if(this.selectedMechanics.indexOf(mechanicName) == -1){
+    //     this.getMechanics().forEach((mechanic: DEMechanic) => {
+    //       if(mechanic.mechanicRule.name != mechanicName){
+    //         this.selectedMechanics.push(mechanic.mechanicRule.name)
+    //       }
+    //     })
+    //   } else {
+    //     this.selectedMechanics = []
+    //   }
+    // } else {
+    //   if(this.selectedMechanics.indexOf(mechanicName) != -1){
+    //     this.selectedMechanics = this.selectedMechanics.filter((name: string) => name != mechanicName)
+    //   } else {
+    //     this.selectedMechanics.push(mechanicName)
+    //   }
+    // }
+    // this.drawCanvas()
   }
 
   rightClick(mechanic: DEMechanic){

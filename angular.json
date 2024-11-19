@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "../MechanicGraphSite/docs/",
+            "outputPath": "../mechanicgraph/docs/",
             "baseHref": "/mechanicgraph/",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -104,5 +104,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

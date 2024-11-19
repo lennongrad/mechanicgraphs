@@ -1,12 +1,15 @@
-<!--<div id="cover" *ngIf="coverActive"></div>-->
+<div id="cover" *ngIf="coverActive"></div>
 
+<app-graph-list></app-graph-list>
+<!--
 <div id="main-container">
     <app-sidebar></app-sidebar>
     <app-graph-list *ngIf="getActiveScreen() == 'Set'"></app-graph-list>
-    <app-evergreen-set *ngIf="getActiveScreen() == 'EvergreenSet'"></app-evergreen-set>
+    <app-evergreen-set *ngIf="getActiveScreen() == 'EvergreenSet'" style="position: relative"></app-evergreen-set>
     <app-evergreen-color *ngIf="getActiveScreen() == 'EvergreenColor'"></app-evergreen-color>
     <app-miscellaneous *ngIf="getActiveScreen() == 'Misc'"></app-miscellaneous>
 </div>
+-->
 
 <footer *ngIf="!coverActive">
     This website is unofficial Fan Content permitted under the <a href="https://company.wizards.com/en/legal/fancontentpolicy">Wizards of the Coast Fan Content Policy</a>. 
